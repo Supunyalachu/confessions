@@ -2,20 +2,56 @@
 <html>
 <head>
 <title>Confession Wall</title>
-<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h2>Anonymous reason Wall</h2>
+<h2>Anonymous Wall</h2>
 
-<textarea id="text" placeholder="Type anything..."></textarea><br>
-
-<button onclick="add()">Post</button>
+<textarea id="msg" placeholder="Type here..."></textarea><br>
+<button onclick="send()">Post</button>
 
 <div id="all"></div>
 
-<script src="script.js"></script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBVI9qbRsNDC_plXF8lqfcgYgzBR8lYnv4",
+  authDomain: "confessions-94ea4.firebaseapp.com",
+  databaseURL: "https://confessions-94ea4-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "confessions-94ea4",
+  storageBucket: "confessions-94ea4.firebasestorage.app",
+  messagingSenderId: "547916493",
+  appId: "1:547916493:web:d290d48aaf6c63b221b784",
+  measurementId: "G-N300S30BBE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const wallRef = ref(db,"posts");
+
+function send(){
+ let t=document.getElementById("msg").value;
+ if(t==="") return;
+
+ push(wallRef,{text:t});
+ document.getElementById("msg").value="";
+}
+
+window.send=send;
+
+onValue(wallRef,snap=>{
+ let box=document.getElementById("all");
+ box.innerHTML="";
+ snap.forEach(c=>{
+   box.innerHTML+=`<p>${c.val().text}</p>`;
+ });
+});
+
+</script>
 
 </body>
 </html>
